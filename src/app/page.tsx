@@ -381,31 +381,35 @@ export default function HomePage() {
             </p>
 
             {/* CONVERTER CARD */}
-            <div className="w-full max-w-2xl mx-auto p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl shadow-slate-200/80 space-y-5 text-left transition hover:border-orange-300">
-              <div className="flex items-center justify-between gap-2 flex-wrap pb-1">
-                <span className="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                  <Link2 className="w-4 h-4 text-orange-600" />
-                  Dán liên kết Shopee sản phẩm:
-                </span>
+            <div className="w-full max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl shadow-slate-200/80 space-y-4 text-left transition hover:border-orange-300">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3.5">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-orange-100 text-orange-600">
+                    <Link2 className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                    Dán liên kết Shopee sản phẩm:
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsGuideModalOpen(true)}
-                  className="text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline flex items-center gap-1.5 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-xl border border-orange-200 transition shadow-xs cursor-pointer active:scale-95"
+                  className="inline-flex items-center gap-1.5 self-start sm:self-auto text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100/80 px-3 py-1.5 rounded-full border border-orange-200/80 transition cursor-pointer active:scale-95"
                 >
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  Hướng dẫn lấy link (PC & App)
+                  <HelpCircle className="w-3.5 h-3.5 text-orange-500" />
+                  <span>Hướng dẫn lấy link</span>
                 </button>
               </div>
 
-              <form onSubmit={handleConvert} className="space-y-4">
-                <div className="relative flex flex-col sm:flex-row items-stretch gap-2.5">
+              <form onSubmit={handleConvert} className="space-y-4 pt-1">
+                <div className="flex flex-col sm:flex-row items-stretch gap-3">
                   <div className="relative flex-1">
                     <input
                       type="url"
                       value={inputUrl}
                       onChange={(e) => dispatch(setInputUrl(e.target.value))}
                       placeholder="Dán link Shopee (VD: https://shopee.vn/product/...)"
-                      className="w-full pl-11 pr-20 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition font-medium"
+                      className="w-full pl-11 pr-24 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition font-medium shadow-xs"
                       required
                     />
                     <Link2 className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -413,7 +417,7 @@ export default function HomePage() {
                       type="button"
                       onClick={handlePaste}
                       title="Dán từ Clipboard"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-700 text-xs font-bold transition flex items-center gap-1.5 border border-orange-200 shadow-xs"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-orange-100/90 hover:bg-orange-200/90 text-orange-700 text-xs font-bold transition flex items-center gap-1.5 border border-orange-200/80 shadow-xs cursor-pointer active:scale-95"
                     >
                       <ClipboardPaste className="w-3.5 h-3.5 text-orange-600" />
                       Dán
@@ -423,7 +427,7 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={isConverting}
-                    className="py-3.5 sm:py-4 px-6 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-orange-500/25 disabled:opacity-50 transition flex items-center justify-center gap-2 tracking-wide shrink-0 active:scale-98"
+                    className="py-3.5 sm:py-4 px-7 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-orange-500/25 disabled:opacity-50 transition flex items-center justify-center gap-2 tracking-wide shrink-0 active:scale-98 cursor-pointer"
                   >
                     {isConverting ? (
                       <>
@@ -458,32 +462,45 @@ export default function HomePage() {
                   </div>
 
                   {/* SHOPEE AFFILIATE SHORTLINK */}
-                  <div className="space-y-1">
-                    <span className="text-[11px] font-bold text-slate-600">🔗 Link Shopee Affiliate Chính Thức:</span>
-                    <div className="p-3 rounded-xl bg-white border border-orange-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-                      <span className="text-xs sm:text-sm font-mono font-bold text-orange-600 break-all truncate">
-                        {convertedResult.affiliateUrl}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                        <a
-                          href={convertedResult.affiliateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          Mở
-                        </a>
-                        <button
-                          onClick={() => handleCopy(convertedResult.affiliateUrl)}
-                          className="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md shadow-orange-500/20"
-                        >
-                          {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                          {copied ? 'Đã chép' : 'Sao chép'}
-                        </button>
+                  {(() => {
+                    const isOfficialShortLink = convertedResult.affiliateUrl?.startsWith('https://s.shopee.vn');
+                    const resultUrl = isOfficialShortLink
+                      ? convertedResult.affiliateUrl
+                      : typeof window !== 'undefined'
+                      ? `${window.location.origin}/s/${convertedResult.shortCode}`
+                      : `/s/${convertedResult.shortCode}`;
+
+                    return (
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-slate-600">
+                          🔗 Link Affiliate {isOfficialShortLink ? 'Shopee Chính Thức' : 'Rút Gọn'}:
+                        </span>
+                        <div className="p-3 rounded-xl bg-white border border-orange-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+                          <span className="text-xs sm:text-sm font-mono font-bold text-orange-600 break-all truncate">
+                            {resultUrl}
+                          </span>
+                          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                            <a
+                              href={resultUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              Mở
+                            </a>
+                            <button
+                              onClick={() => handleCopy(resultUrl)}
+                              className="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md shadow-orange-500/20"
+                            >
+                              {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                              {copied ? 'Đã chép' : 'Sao chép'}
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -812,10 +829,10 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* GUIDANCE MODAL (HOW TO GET SHOPEE LINK ON PC / MOBILE / BOT) */}
+      {/* GUIDANCE MODAL (HOW TO GET SHOPEE LINK ON PC / MOBILE) */}
       {isGuideModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeInTab">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-modal-pop relative text-left">
+          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-modal-pop relative text-left">
             {/* Modal Header */}
             <div className="p-5 sm:p-6 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -824,7 +841,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-black text-lg sm:text-xl tracking-tight">Hướng Dẫn Lấy Link Shopee</h3>
-                  <p className="text-xs text-orange-100 font-medium">Chi tiết cách lấy link sản phẩm trên Điện Thoại, PC & Bot Messenger</p>
+                  <p className="text-xs text-orange-100 font-medium">Chi tiết cách lấy link sản phẩm trực quan trên Điện Thoại & Máy Tính</p>
                 </div>
               </div>
               <button
@@ -837,13 +854,13 @@ export default function HomePage() {
             </div>
 
             {/* Tabs Selector */}
-            <div className="flex border-b border-slate-200 bg-slate-50 p-2 gap-1.5">
+            <div className="flex border-b border-slate-200 bg-slate-50 p-2 gap-2">
               <button
                 type="button"
                 onClick={() => setGuideTab('mobile')}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition cursor-pointer ${
                   guideTab === 'mobile'
-                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
+                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200 ring-2 ring-orange-500/20'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
@@ -853,44 +870,41 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setGuideTab('pc')}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition cursor-pointer ${
                   guideTab === 'pc'
-                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
+                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200 ring-2 ring-orange-500/20'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <Monitor className="w-4 h-4 text-amber-500" />
                 Máy Tính (Trình Duyệt)
               </button>
-              <button
-                type="button"
-                onClick={() => setGuideTab('bot')}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                  guideTab === 'bot'
-                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                <Bot className="w-4 h-4 text-blue-500" />
-                FB Messenger Bot
-              </button>
             </div>
 
             {/* Modal Body / Tab Content */}
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="p-5 sm:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
               {guideTab === 'mobile' && (
                 <div className="space-y-4">
                   <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-100 text-xs text-orange-800 font-semibold flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-orange-600 shrink-0" />
-                    Cách lấy link trên Ứng Dụng Shopee (iOS / Android)
+                    Cách lấy link trực quan trên Ứng Dụng Shopee (iOS / Android)
                   </div>
 
-                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
+                  {/* VISUAL GUIDE IMAGE */}
+                  <div className="w-full rounded-2xl border border-slate-200 overflow-hidden shadow-sm bg-slate-50">
+                    <img
+                      src="/shopee_mobile_guide.png"
+                      alt="Hướng dẫn lấy link Shopee trên Điện thoại"
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+
+                  <ol className="space-y-3 text-xs sm:text-sm text-slate-700 pt-2">
                     <li className="flex gap-3 items-start">
                       <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
                       <div>
                         <p className="font-bold text-slate-900">Mở App Shopee & chọn sản phẩm</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Tìm kiếm sản phẩm bạn muốn chia sẻ hoặc mua hàng.</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Tìm kiếm sản phẩm bất kỳ bạn muốn chia sẻ hoặc mua hàng.</p>
                       </div>
                     </li>
                     <li className="flex gap-3 items-start">
@@ -899,7 +913,7 @@ export default function HomePage() {
                         <p className="font-bold text-slate-900 flex items-center gap-1">
                           Bấm nút Chia Sẻ <Share2 className="w-3.5 h-3.5 text-orange-600 inline" />
                         </p>
-                        <p className="text-slate-500 text-xs mt-0.5">Nhấn biểu tượng hình mũi tên/chia sẻ ở góc trên bên phải màn hình chi tiết sản phẩm.</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Nhấn biểu tượng hình mũi tên/chia sẻ góc trên bên phải màn hình sản phẩm.</p>
                       </div>
                     </li>
                     <li className="flex gap-3 items-start">
@@ -908,7 +922,7 @@ export default function HomePage() {
                         <p className="font-bold text-slate-900 flex items-center gap-1">
                           Chọn "Sao chép liên kết" <Copy className="w-3.5 h-3.5 text-orange-600 inline" />
                         </p>
-                        <p className="text-slate-500 text-xs mt-0.5">Đường dẫn sản phẩm (dạng <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://s.shopee.vn/...</code> hoặc <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://shopee.vn/...</code>) sẽ được lưu vào bộ nhớ tạm.</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Đường dẫn sản phẩm dạng <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://s.shopee.vn/...</code> sẽ được lưu vào clipboard.</p>
                       </div>
                     </li>
                     <li className="flex gap-3 items-start">
@@ -917,7 +931,7 @@ export default function HomePage() {
                         <p className="font-bold text-slate-900 flex items-center gap-1">
                           Dán vào AffSnap & nhận link hoa hồng <ClipboardPaste className="w-3.5 h-3.5 text-orange-600 inline" />
                         </p>
-                        <p className="text-slate-500 text-xs mt-0.5">Quay lại website, bấm nút <strong>Dán</strong> rồi nhấn <strong>Lấy link</strong> để tạo Custom Affiliate Link!</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Quay lại website AffSnap, bấm nút <strong>Dán</strong> rồi nhấn <strong>Lấy link</strong>!</p>
                       </div>
                     </li>
                   </ol>
@@ -928,62 +942,38 @@ export default function HomePage() {
                 <div className="space-y-4">
                   <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 text-xs text-amber-800 font-semibold flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                    Cách lấy link trên Trình Duyệt Máy Tính (Chrome, Safari, Edge...)
+                    Cách lấy link trực quan trên Trình Duyệt Máy Tính (Chrome, Safari, Edge...)
                   </div>
 
-                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
+                  {/* VISUAL GUIDE IMAGE */}
+                  <div className="w-full rounded-2xl border border-slate-200 overflow-hidden shadow-sm bg-slate-50">
+                    <img
+                      src="/shopee_pc_guide.png"
+                      alt="Hướng dẫn lấy link Shopee trên Máy tính"
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+
+                  <ol className="space-y-3 text-xs sm:text-sm text-slate-700 pt-2">
                     <li className="flex gap-3 items-start">
                       <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
                       <div>
                         <p className="font-bold text-slate-900">Mở Shopee.vn trên trình duyệt máy tính</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Tìm kiếm sản phẩm và mở trang chi tiết sản phẩm.</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Mở trang sản phẩm mong muốn mua hoặc giới thiệu.</p>
                       </div>
                     </li>
                     <li className="flex gap-3 items-start">
                       <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
                       <div>
                         <p className="font-bold text-slate-900">Sao chép đường dẫn trên thanh địa chỉ</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Bôi đen toàn bộ link <code className="bg-slate-100 px-1.5 py-0.5 rounded text-amber-700 font-mono text-[11px]">https://shopee.vn/product/...</code> trên cùng và bấm <strong>Ctrl + C</strong> (hoặc <strong>Cmd + C</strong> trên Mac).</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Bôi đen toàn bộ link <code className="bg-slate-100 px-1.5 py-0.5 rounded text-amber-700 font-mono text-[11px]">https://shopee.vn/product/...</code> và nhấn <strong>Ctrl + C</strong> (hoặc <strong>Cmd + C</strong> trên Mac).</p>
                       </div>
                     </li>
                     <li className="flex gap-3 items-start">
                       <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
                       <div>
-                        <p className="font-bold text-slate-900">Dán vào ô nhập liệu & bấm Lấy link</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Dán link vào khung AffSnap trên website và nhấn nút <strong>Lấy link</strong> để tạo link rinh hoa hồng.</p>
-                      </div>
-                    </li>
-                  </ol>
-                </div>
-              )}
-
-              {guideTab === 'bot' && (
-                <div className="space-y-4">
-                  <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-800 font-semibold flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-blue-600 shrink-0" />
-                    Tự động tạo link qua Facebook Messenger Bot
-                  </div>
-
-                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
-                    <li className="flex gap-3 items-start">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
-                      <div>
-                        <p className="font-bold text-slate-900">Mở ứng dụng Messenger</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Mở ô chat nhắn tin tới Fanpage <strong>AffSnap</strong> trên điện thoại hoặc máy tính.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-3 items-start">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
-                      <div>
-                        <p className="font-bold text-slate-900">Gửi câu lệnh hoặc dán link Shopee</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Soạn cú pháp: <code className="bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-mono font-bold text-[11px]">/getlink &lt;link_shopee&gt;</code> hoặc dán trực tiếp link Shopee gửi sang.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-3 items-start">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
-                      <div>
-                        <p className="font-bold text-slate-900">Nhận Custom Link Affiliate ngay tức thì</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Bot sẽ tự động trả lời tin nhắn kèm link Affiliate rút gọn chính thức để bạn dùng ngay!</p>
+                        <p className="font-bold text-slate-900">Dán vào khung AffSnap & bấm Lấy link</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Dán link vào khung nhập liệu trên AffSnap và bấm nút <strong>Lấy link</strong>!</p>
                       </div>
                     </li>
                   </ol>

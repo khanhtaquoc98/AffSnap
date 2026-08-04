@@ -218,9 +218,11 @@ async function convertShopeeLink(trimmedUrl: string): Promise<{ success: boolean
     linkRecord.affiliateUrl = officialShortLink;
   }
 
+  const finalShortUrl = officialShortLink || `https://affsnap.vercel.app/s/${linkRecord.shortCode}`;
+
   return {
     success: true,
-    affiliateUrl: linkRecord.affiliateUrl,
+    affiliateUrl: finalShortUrl,
   };
 }
 
