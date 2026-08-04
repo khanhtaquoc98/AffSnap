@@ -309,10 +309,10 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen lg:h-screen w-screen overflow-x-hidden lg:overflow-hidden text-slate-900 selection:bg-orange-500 selection:text-white relative font-sans">
+    <div className="min-h-screen lg:h-screen w-full max-w-full overflow-x-hidden lg:overflow-hidden text-slate-900 selection:bg-orange-500 selection:text-white relative font-sans">
       {/* SOFT AMBIENT GLOW SPHERES */}
-      <div className="fixed top-10 left-10 w-96 h-96 bg-orange-400/20 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
-      <div className="fixed bottom-10 right-10 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-10 left-10 w-72 sm:w-96 h-72 sm:h-96 bg-orange-400/20 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
+      <div className="fixed bottom-10 right-10 w-72 sm:w-96 h-72 sm:h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* FIXED HEADER AT TOP */}
       <Header />
@@ -344,31 +344,31 @@ export default function HomePage() {
       {/* SLIDES CONTAINER WITH SMOOTH SLIDE TRANSITION */}
       <div
         suppressHydrationWarning
-        className="w-full transition-transform duration-700 ease-in-out lg:h-screen"
+        className="w-full max-w-full transition-transform duration-700 ease-in-out lg:h-screen"
         style={{
-          transform: isMounted && typeof window !== 'undefined' && window.innerWidth >= 1024 ? `translateY(-${activeSlide * 100}vh)` : 'none',
+          transform: isDesktop ? `translateY(-${activeSlide * 100}vh)` : 'none',
         }}
       >
         {/* ========================================== */}
         {/* SLIDE 0: HERO BANNER & INPUT CONVERTER */}
         {/* ========================================== */}
-        <section className="min-h-screen lg:h-screen w-full relative flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center pt-24 pb-12 lg:py-0 overflow-hidden">
-          <div className="max-w-4xl mx-auto space-y-6 lg:space-y-7 relative z-10 my-auto">
+        <section className="min-h-screen lg:h-screen w-full max-w-full relative flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center pt-20 pb-12 lg:py-0 overflow-hidden">
+          <div className="w-full max-w-4xl mx-auto space-y-5 sm:space-y-6 lg:space-y-7 relative z-10 my-auto">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100/90 border border-orange-200 text-orange-700 text-xs sm:text-sm font-bold shadow-xs">
-              <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
-              <span>AffSnap PRO • Chuyển Đổi Link Shopee Tự Động & Mở Tab Mới Tức Thì</span>
+            <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-orange-100/90 border border-orange-200 text-orange-700 text-xs sm:text-sm font-bold shadow-xs max-w-full truncate">
+              <Sparkles className="w-4 h-4 text-orange-600 animate-pulse shrink-0" />
+              <span className="truncate">AffSnap PRO • Chuyển Đổi Link Shopee Tự Động & Mở Tab Mới</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.15]">
+            <h1 className="text-2xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.2] sm:leading-[1.15]">
               Nhập Link Shopee - Nhận Ngay{' '}
               <span className="bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 bg-clip-text text-transparent">
                 Link Affiliate
               </span>
             </h1>
 
-            <p className="text-slate-600 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+            <p className="text-slate-600 text-xs sm:text-base lg:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
               Hệ thống tự động chuyển URL sản phẩm Shopee thành liên kết chia sẻ hoa hồng chuyên nghiệp. Tích hợp nút dán chớp mắt và tự động mở tab mới.
             </p>
 
