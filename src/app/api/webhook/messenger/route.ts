@@ -40,10 +40,11 @@ export async function POST(req: NextRequest) {
           if (senderPsid && webhookEvent.message && webhookEvent.message.text) {
             const messageText = webhookEvent.message.text.trim();
 
-            // Process message in async background task (avoid blocking Facebook webhook response)
-            handleIncomingMessage(senderPsid, messageText).catch((err) => {
+            try {
+              await handleIncomingMessage(senderPsid, messageText);
+            } catch (err) {
               console.error('[FB Messenger Webhook] Error handling message:', err);
-            });
+            }
           }
         }
       }
