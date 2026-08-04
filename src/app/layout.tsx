@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   title: "AffSnap - Công Cụ Rút Gọn Link & Tự Động Đối Soát Shopee Affiliate",
   description: "AffSnap - Chuyển đổi link Shopee Affiliate tức thì và quản lý hoa hồng tự động",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
     apple: "/icon.png",
   },
   openGraph: {

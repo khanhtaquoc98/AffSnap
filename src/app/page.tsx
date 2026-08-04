@@ -382,22 +382,26 @@ export default function HomePage() {
 
             {/* CONVERTER CARD */}
             <div className="w-full max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl shadow-slate-200/80 space-y-4 text-left transition hover:border-orange-300">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3.5">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-orange-100 text-orange-600">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1.5 rounded-lg bg-orange-100 text-orange-600 shrink-0">
                     <Link2 className="w-4 h-4" />
                   </div>
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                  <span className="hidden sm:inline text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight truncate">
                     Dán liên kết Shopee sản phẩm:
+                  </span>
+                  <span className="inline sm:hidden text-xs font-extrabold text-slate-800 tracking-tight truncate">
+                    Nhập link Shopee:
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsGuideModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 self-start sm:self-auto text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100/80 px-3 py-1.5 rounded-full border border-orange-200/80 transition cursor-pointer active:scale-95"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100/80 px-2.5 sm:px-3 py-1.5 rounded-full border border-orange-200/80 transition cursor-pointer active:scale-95 shrink-0"
                 >
                   <HelpCircle className="w-3.5 h-3.5 text-orange-500" />
-                  <span>Hướng dẫn lấy link</span>
+                  <span className="hidden sm:inline">Hướng dẫn lấy link</span>
+                  <span className="inline sm:hidden">Hướng dẫn</span>
                 </button>
               </div>
 
