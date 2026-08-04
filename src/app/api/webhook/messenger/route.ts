@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log('[FB Webhook Received Payload]:', JSON.stringify(body, null, 2));
 
     if (body.object === 'page') {
       for (const entry of body.entry) {
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
 
           if (senderPsid && webhookEvent.message && webhookEvent.message.text) {
             const messageText = webhookEvent.message.text.trim();
+            console.log(`[FB Webhook] Message from PSID ${senderPsid}: "${messageText}"`);
 
             try {
               await handleIncomingMessage(senderPsid, messageText);
@@ -49,7 +51,6 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Facebook requires a 200 OK response within 20 seconds
       return NextResponse.json({ status: 'EVENT_RECEIVED' }, { status: 200 });
     } else {
       return new NextResponse('Not Found', { status: 404 });
