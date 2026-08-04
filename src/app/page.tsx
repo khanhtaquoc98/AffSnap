@@ -457,16 +457,16 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {/* DOMAIN SHORTLINK */}
+                  {/* SHOPEE AFFILIATE SHORTLINK */}
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold text-slate-600">🔗 Link Rút Gọn Chia Sẻ:</span>
+                    <span className="text-[11px] font-bold text-slate-600">🔗 Link Shopee Affiliate Chính Thức:</span>
                     <div className="p-3 rounded-xl bg-white border border-orange-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
                       <span className="text-xs sm:text-sm font-mono font-bold text-orange-600 break-all truncate">
-                        {typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`}
+                        {convertedResult.affiliateUrl}
                       </span>
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                         <a
-                          href={typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`}
+                          href={convertedResult.affiliateUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition"
@@ -475,7 +475,7 @@ export default function HomePage() {
                           Mở
                         </a>
                         <button
-                          onClick={() => handleCopy(typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`)}
+                          onClick={() => handleCopy(convertedResult.affiliateUrl)}
                           className="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md shadow-orange-500/20"
                         >
                           {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
