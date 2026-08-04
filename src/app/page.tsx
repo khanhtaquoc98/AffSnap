@@ -25,6 +25,12 @@ import {
   Lock,
   Headphones,
   PhoneCall,
+  Smartphone,
+  Monitor,
+  Share2,
+  X,
+  MessageSquare,
+  Bot,
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { useAppDispatch, useAppSelector } from '@/store';
@@ -48,6 +54,8 @@ export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  const [guideTab, setGuideTab] = useState<'mobile' | 'pc' | 'bot'>('mobile');
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isLockedRef = useRef(false);
@@ -374,6 +382,21 @@ export default function HomePage() {
 
             {/* CONVERTER CARD */}
             <div className="w-full max-w-2xl mx-auto p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl shadow-slate-200/80 space-y-5 text-left transition hover:border-orange-300">
+              <div className="flex items-center justify-between gap-2 flex-wrap pb-1">
+                <span className="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                  <Link2 className="w-4 h-4 text-orange-600" />
+                  Dán liên kết Shopee sản phẩm:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsGuideModalOpen(true)}
+                  className="text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline flex items-center gap-1.5 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-xl border border-orange-200 transition shadow-xs cursor-pointer active:scale-95"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  Hướng dẫn lấy link (PC & App)
+                </button>
+              </div>
+
               <form onSubmit={handleConvert} className="space-y-4">
                 <div className="relative flex flex-col sm:flex-row items-stretch gap-2.5">
                   <div className="relative flex-1">
@@ -788,6 +811,199 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+
+      {/* GUIDANCE MODAL (HOW TO GET SHOPEE LINK ON PC / MOBILE / BOT) */}
+      {isGuideModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeInTab">
+          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-modal-pop relative text-left">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-white/20 backdrop-blur-xs">
+                  <HelpCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg sm:text-xl tracking-tight">Hướng Dẫn Lấy Link Shopee</h3>
+                  <p className="text-xs text-orange-100 font-medium">Chi tiết cách lấy link sản phẩm trên Điện Thoại, PC & Bot Messenger</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsGuideModalOpen(false)}
+                className="p-2 rounded-full hover:bg-white/20 transition text-white/90 hover:text-white cursor-pointer"
+                title="Đóng modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Tabs Selector */}
+            <div className="flex border-b border-slate-200 bg-slate-50 p-2 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setGuideTab('mobile')}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  guideTab === 'mobile'
+                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Smartphone className="w-4 h-4 text-orange-500" />
+                Điện Thoại (App Shopee)
+              </button>
+              <button
+                type="button"
+                onClick={() => setGuideTab('pc')}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  guideTab === 'pc'
+                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Monitor className="w-4 h-4 text-amber-500" />
+                Máy Tính (Trình Duyệt)
+              </button>
+              <button
+                type="button"
+                onClick={() => setGuideTab('bot')}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  guideTab === 'bot'
+                    ? 'bg-white text-orange-600 shadow-sm border border-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Bot className="w-4 h-4 text-blue-500" />
+                FB Messenger Bot
+              </button>
+            </div>
+
+            {/* Modal Body / Tab Content */}
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+              {guideTab === 'mobile' && (
+                <div className="space-y-4">
+                  <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-100 text-xs text-orange-800 font-semibold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-orange-600 shrink-0" />
+                    Cách lấy link trên Ứng Dụng Shopee (iOS / Android)
+                  </div>
+
+                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Mở App Shopee & chọn sản phẩm</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Tìm kiếm sản phẩm bạn muốn chia sẻ hoặc mua hàng.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <div>
+                        <p className="font-bold text-slate-900 flex items-center gap-1">
+                          Bấm nút Chia Sẻ <Share2 className="w-3.5 h-3.5 text-orange-600 inline" />
+                        </p>
+                        <p className="text-slate-500 text-xs mt-0.5">Nhấn biểu tượng hình mũi tên/chia sẻ ở góc trên bên phải màn hình chi tiết sản phẩm.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                      <div>
+                        <p className="font-bold text-slate-900 flex items-center gap-1">
+                          Chọn "Sao chép liên kết" <Copy className="w-3.5 h-3.5 text-orange-600 inline" />
+                        </p>
+                        <p className="text-slate-500 text-xs mt-0.5">Đường dẫn sản phẩm (dạng <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://s.shopee.vn/...</code> hoặc <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://shopee.vn/...</code>) sẽ được lưu vào bộ nhớ tạm.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                      <div>
+                        <p className="font-bold text-slate-900 flex items-center gap-1">
+                          Dán vào AffSnap & nhận link hoa hồng <ClipboardPaste className="w-3.5 h-3.5 text-orange-600 inline" />
+                        </p>
+                        <p className="text-slate-500 text-xs mt-0.5">Quay lại website, bấm nút <strong>Dán</strong> rồi nhấn <strong>Lấy link</strong> để tạo Custom Affiliate Link!</p>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+              )}
+
+              {guideTab === 'pc' && (
+                <div className="space-y-4">
+                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 text-xs text-amber-800 font-semibold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                    Cách lấy link trên Trình Duyệt Máy Tính (Chrome, Safari, Edge...)
+                  </div>
+
+                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Mở Shopee.vn trên trình duyệt máy tính</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Tìm kiếm sản phẩm và mở trang chi tiết sản phẩm.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Sao chép đường dẫn trên thanh địa chỉ</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Bôi đen toàn bộ link <code className="bg-slate-100 px-1.5 py-0.5 rounded text-amber-700 font-mono text-[11px]">https://shopee.vn/product/...</code> trên cùng và bấm <strong>Ctrl + C</strong> (hoặc <strong>Cmd + C</strong> trên Mac).</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Dán vào ô nhập liệu & bấm Lấy link</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Dán link vào khung AffSnap trên website và nhấn nút <strong>Lấy link</strong> để tạo link rinh hoa hồng.</p>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+              )}
+
+              {guideTab === 'bot' && (
+                <div className="space-y-4">
+                  <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-800 font-semibold flex items-center gap-2">
+                    <Bot className="w-4 h-4 text-blue-600 shrink-0" />
+                    Tự động tạo link qua Facebook Messenger Bot
+                  </div>
+
+                  <ol className="space-y-3.5 text-xs sm:text-sm text-slate-700">
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Mở ứng dụng Messenger</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Mở ô chat nhắn tin tới Fanpage <strong>AffSnap</strong> trên điện thoại hoặc máy tính.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Gửi câu lệnh hoặc dán link Shopee</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Soạn cú pháp: <code className="bg-slate-100 px-2 py-0.5 rounded text-blue-600 font-mono font-bold text-[11px]">/getlink &lt;link_shopee&gt;</code> hoặc dán trực tiếp link Shopee gửi sang.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3 items-start">
+                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                      <div>
+                        <p className="font-bold text-slate-900">Nhận Custom Link Affiliate ngay tức thì</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Bot sẽ tự động trả lời tin nhắn kèm link Affiliate rút gọn chính thức để bạn dùng ngay!</p>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsGuideModalOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+              >
+                Đã hiểu, đóng hướng dẫn
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
