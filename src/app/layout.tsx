@@ -21,6 +21,11 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
     apple: "/icon.png",
   },
+  openGraph: {
+    title: "AffSnap - Công Cụ Rút Gọn Link & Tự Động Đối Soát Shopee Affiliate",
+    description: "Chuyển đổi link Shopee Affiliate tức thì, tự động đính kèm SubID và đối soát hoa hồng minh bạch.",
+    images: ["/facebook_banner.png"],
+  },
 };
 
 export default function RootLayout({
