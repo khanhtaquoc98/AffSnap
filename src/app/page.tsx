@@ -47,10 +47,20 @@ export default function HomePage() {
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isLockedRef = useRef(false);
   const touchStartYRef = useRef(0);
+
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   const totalSlides = 5;
 
@@ -422,47 +432,32 @@ export default function HomePage() {
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       Tạo Link Affiliate Thành Công! (Đã tự động mở tab mới)
                     </span>
-                    <span className="text-[10px] font-mono bg-white text-slate-800 px-2.5 py-1 rounded-full border border-orange-200 font-bold">
-                      SubID: {convertedResult.subId}
-                    </span>
                   </div>
 
-                  {/* 1. DOMAIN SHORTLINK */}
+                  {/* DOMAIN SHORTLINK */}
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold text-slate-600">🔗 Link Rút Gọn Chia Sẻ (Đếm Lượt Click):</span>
+                    <span className="text-[11px] font-bold text-slate-600">🔗 Link Rút Gọn Chia Sẻ:</span>
                     <div className="p-3 rounded-xl bg-white border border-orange-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
                       <span className="text-xs sm:text-sm font-mono font-bold text-orange-600 break-all truncate">
                         {typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`}
                       </span>
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                        <a
+                          href={typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Mở
+                        </a>
                         <button
                           onClick={() => handleCopy(typeof window !== 'undefined' ? `${window.location.origin}/s/${convertedResult.shortCode}` : `/s/${convertedResult.shortCode}`)}
                           className="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md shadow-orange-500/20"
                         >
                           {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                          {copied ? 'Đã chép' : 'Chép Link Ngắn'}
+                          {copied ? 'Đã chép' : 'Sao chép'}
                         </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. DIRECT SHOPEE PRODUCT URL WITH SUB_ID */}
-                  <div className="space-y-1">
-                    <span className="text-[11px] font-bold text-slate-600">🛒 Link Sản Phẩm Shopee Trực Tiếp (Kèm SubID):</span>
-                    <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-                      <span className="text-xs font-mono font-semibold text-slate-700 break-all truncate">
-                        {convertedResult.affiliateUrl}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                        <a
-                          href={convertedResult.affiliateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5 text-orange-400" />
-                          Mở Shopee
-                        </a>
                       </div>
                     </div>
                   </div>
