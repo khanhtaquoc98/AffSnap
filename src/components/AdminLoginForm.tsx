@@ -9,8 +9,8 @@ import { setUserSession } from '@/store/slices/authSlice';
 export const AdminLoginForm: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const [emailInput, setEmailInput] = useState('khanhtaquoc98@gmail.com');
-  const [passwordInput, setPasswordInput] = useState('2804998');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
