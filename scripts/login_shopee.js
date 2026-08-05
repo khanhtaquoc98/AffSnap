@@ -1,10 +1,11 @@
-const puppeteer = require('puppeteer-core');
 const path = require('path');
 
 async function launchShopeeLoginWindow() {
   console.log('----------------------------------------------------');
   console.log('🚀 ĐANG MỞ TRÌNH DUYỆT CHROME ĐỂ ĐĂNG NHẬP SHOPEE AFFILIATE...');
   console.log('----------------------------------------------------');
+
+  const { default: puppeteer } = await import('puppeteer-core');
 
   const executablePath =
     process.env.CHROME_PATH ||
@@ -54,7 +55,8 @@ async function launchShopeeLoginWindow() {
 
         // Sync token to local dev server / Supabase DB via Admin config API
         try {
-          const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+          const fetchModule = await import('node-fetch');
+          const fetch = fetchModule.default || fetchModule;
           const res = await fetch('http://localhost:3333/api/admin/config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
