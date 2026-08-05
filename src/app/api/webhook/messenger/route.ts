@@ -211,18 +211,19 @@ async function convertShopeeLink(trimmedUrl: string): Promise<{ success: boolean
     }
   }
 
-  // Save link record in store
-  const linkRecord = store.addLink(trimmedUrl, 'fb_bot');
-
-  if (officialShortLink) {
-    linkRecord.affiliateUrl = officialShortLink;
+  if (!officialShortLink) {
+    return {
+      success: false,
+      error: 'Hệ thống đang chờ cập nhật Cookie Shopee từ Admin để tạo link s.shopee.vn. Vui lòng thử lại sau!',
+    };
   }
 
-  const finalShortUrl = officialShortLink || `https://affsnap.vercel.app/s/${linkRecord.shortCode}`;
+  const linkRecord = store.addLink(trimmedUrl, 'fb_bot');
+  linkRecord.affiliateUrl = officialShortLink;
 
   return {
     success: true,
-    affiliateUrl: finalShortUrl,
+    affiliateUrl: officialShortLink,
   };
 }
 
