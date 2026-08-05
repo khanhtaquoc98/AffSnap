@@ -1,4 +1,6 @@
 const path = require('path');
+const fs = require('fs');
+const http = require('http');
 
 async function launchShopeeLoginWindow() {
   console.log('----------------------------------------------------');
@@ -19,7 +21,13 @@ async function launchShopeeLoginWindow() {
     headless: false, // Visual Chrome window on Mac screen
     defaultViewport: null,
     userDataDir,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'],
+    ignoreDefaultArgs: ['--enable-automation'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-blink-features=AutomationControlled',
+      '--start-maximized',
+    ],
   });
 
   const pages = await browser.pages();
@@ -51,31 +59,64 @@ async function launchShopeeLoginWindow() {
         console.log('====================================================');
         console.log('✅ ĐÃ PHÁT HIỆN ĐĂNG NHẬP SHOPEE AFFILIATE THÀNH CÔNG!');
         console.log('✅ SPC_ST Token:', spcSt.value.substring(0, 30) + '...');
-        console.log('🔄 Đang đồng bộ Cookie mới vào Database Supabase cho Vercel...');
+        console.log('🔄 Đang đồng bộ Cookie mới vào Database Supabase cho Vercel & Local...');
 
-        // Sync token to local dev server / Supabase DB via Admin config API
+        // 1. Save locally to live_cookie.json
+        const jsonPath = path.join(process.cwd(), 'src', 'data', 'live_cookie.json');
         try {
-          const fetchModule = await import('node-fetch');
-          const fetch = fetchModule.default || fetchModule;
-          const res = await fetch('http://localhost:3333/api/admin/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tokenConfig: {
+          fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+          fs.writeFileSync(
+            jsonPath,
+            JSON.stringify(
+              {
                 cookie: cookieStr,
                 headerToken: spcSt.value,
-                status: 'ACTIVE',
+                updatedAt: new Date().toISOString(),
               },
-            }),
-          });
-          const resData = await res.json();
-          if (resData.success) {
-            console.log('⚡ [Đồng Bộ Thành Công]: Cookie đã lưu vào Database Supabase!');
-            console.log('🌐 Vercel & Local từ bây giờ sẽ sử dụng Cookie này để tạo link 24/7!');
-          }
-        } catch (syncErr) {
-          console.warn('⚠️ [Đồng bộ local warning]: Server 3333 chưa bật hoặc không phản hồi. Cookie vẫn đã được lưu trong ./.puppeteer_session');
+              null,
+              2
+            )
+          );
+          console.log('💾 [Lưu File Local]: src/data/live_cookie.json');
+        } catch (fErr) {
+          console.warn('⚠️ Lỗi ghi live_cookie.json:', fErr);
         }
+
+        // 2. Sync to running Next.js dev server on port 3333 via HTTP POST
+        const payload = JSON.stringify({
+          tokenConfig: {
+            cookie: cookieStr,
+            headerToken: spcSt.value,
+            status: 'ACTIVE',
+          },
+        });
+
+        const req = http.request(
+          {
+            hostname: 'localhost',
+            port: 3333,
+            path: '/api/admin/config',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+          },
+          (res) => {
+            let data = '';
+            res.on('data', (chunk) => (data += chunk));
+            res.on('end', () => {
+              console.log('⚡ [Đồng Bộ HTTP 3333]: Thành công! Phản hồi:', data.substring(0, 100));
+            });
+          }
+        );
+
+        req.on('error', (e) => {
+          console.warn('⚠️ [Đồng bộ local warning]: Dev Server 3333 chưa bật. Cookie đã được lưu vào File & Supabase DB!');
+        });
+
+        req.write(payload);
+        req.end();
 
         console.log('====================================================');
 
@@ -83,7 +124,7 @@ async function launchShopeeLoginWindow() {
           console.log('🔒 Đóng cửa sổ thiết lập. Hoàn tất!');
           await browser.close();
           process.exit(0);
-        }, 4000);
+        }, 3000);
       }
     } catch {}
   }, 2000);
