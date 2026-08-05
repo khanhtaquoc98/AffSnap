@@ -265,6 +265,19 @@ export default function AdminConfigPage() {
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:bg-white focus:border-orange-500"
                   />
                 </div>
+
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    Cookie Shopee Phiên Làm Việc Thực (Live Cookie)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={cookieInput}
+                    onChange={(e) => setCookieInput(e.target.value)}
+                    placeholder="Dán chuỗi cookie từ F12 hoặc đồng bộ từ Extension vào đây (SPC_EC=...; SPC_ST=...)"
+                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 resize-none"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end pt-2">
@@ -274,7 +287,7 @@ export default function AdminConfigPage() {
                   className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
                 >
                   <Database className="w-4 h-4 text-orange-400" />
-                  Lưu Cấu Hình Tài Khoản Auto-Login
+                  Lưu Cấu Hình Tài Khoản
                 </button>
               </div>
             </form>
