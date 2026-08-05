@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "login:shopee": "node scripts/login_shopee.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

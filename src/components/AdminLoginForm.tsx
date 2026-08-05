@@ -89,7 +89,7 @@ export const AdminLoginForm: React.FC = () => {
               type="email"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="khanhtaquoc98@gmail.com"
+              placeholder="Email"
               className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 transition"
               required
             />

@@ -14,16 +14,9 @@ export async function POST(req: NextRequest) {
     const cleanEmail = email.trim().toLowerCase();
 
     // Admin Account Credentials Check
-    if (cleanEmail === 'khanhtaquoc98@gmail.com') {
-      if (password && password !== '2804998') {
-        return NextResponse.json(
-          { error: 'Mật khẩu tài khoản Admin không chính xác!' },
-          { status: 401 }
-        );
-      }
-
+    if (cleanEmail === 'khanhtaquoc98@gmail.com' && password === '28041998') {
       const adminSession = {
-        email: 'khanhtaquoc98@gmail.com',
+        email: cleanEmail,
         name: 'Quản Trị Viên Admin',
         role: 'ADMIN' as const,
         balance: 150000,

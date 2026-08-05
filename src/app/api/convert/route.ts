@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
 
     // Call Shopee Affiliate Official GraphQL API with Auto-Refresh Token & Retry mechanism
     if (tokenConfig.cookie || tokenConfig.headerToken) {
-      let currentCookie = tokenConfig.cookie || `SPC_ST=${tokenConfig.headerToken}`;
+      let currentCookie = tokenConfig.cookie || '';
       let currentHeaderToken = tokenConfig.headerToken || 'GCs8pGw5-E-UQ-JjqnhtpIIE_oDJyMHrWF64';
 
-      const executeGqlFetch = async (cookieStr: string, csrfToken: string) => {
+      const executeGqlFetch = async (cookieStr: string, spcStToken: string) => {
         const shopeeGqlEndpoint = 'https://affiliate.shopee.vn/api/v3/gql?q=batchCustomLink';
         const gqlPayload = {
           operationName: 'batchGetCustomLink',
@@ -60,19 +60,22 @@ export async function POST(req: NextRequest) {
           },
         };
 
+        const matchCsrf = cookieStr.match(/csrftoken=([^;]+)/);
+        const csrfFromCookie = matchCsrf && matchCsrf[1] ? matchCsrf[1].trim() : spcStToken;
+
         return await fetch(shopeeGqlEndpoint, {
           method: 'POST',
           headers: {
             accept: 'application/json, text/plain, */*',
-            'accept-language': 'en-US,en;q=0.9',
-            'af-ac-enc-dat': 'c2e173467d7a80c9',
-            'af-ac-enc-sz-token':
-              'cmF9gIKzHslMZQAAkBvplw==|CuhqdbGr7uDplrmDunCwDuK1/eeBNSWU66QmPXNuyGT9EaVeIt0hFHQr2z79aqg9CvJAbelyrBiuig==|iRH0qFo0cQrhkpRg|08|3',
+            'accept-language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
             'affiliate-program-type': '1',
             'cache-control': 'no-cache',
             'content-type': 'application/json; charset=UTF-8',
             cookie: cookieStr,
-            'csrf-token': csrfToken,
+            'csrf-token': csrfFromCookie,
+            'x-csrftoken': csrfFromCookie,
+            'anti-csrftoken-a2': csrfFromCookie,
+            'spc-st': spcStToken,
             origin: 'https://affiliate.shopee.vn',
             pragma: 'no-cache',
             priority: 'u=1, i',
@@ -85,6 +88,7 @@ export async function POST(req: NextRequest) {
             'sec-fetch-site': 'same-origin',
             'user-agent':
               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36',
+            'x-shopee-language': 'vi',
           },
           body: JSON.stringify(gqlPayload),
         });
@@ -93,6 +97,7 @@ export async function POST(req: NextRequest) {
       try {
         let resShopee = await executeGqlFetch(currentCookie, currentHeaderToken);
         let resText = await resShopee.text();
+        console.log('[Shopee GQL First Attempt Response]:', resText);
 
         let isSuccess = false;
         if (resShopee.ok && resText) {
@@ -110,29 +115,17 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // Auto-refresh header & cookie token via Puppeteer Browser if expired (Error 90309999) and retry once
+        // Auto-convert via Puppeteer Browser inside window context if server-side fetch is challenged
         if (!isSuccess && tokenConfig.autoLoginEnabled) {
-          console.warn('[Shopee API Token Expired] Triggering Headless Browser Cookie Refresh...');
-          const { refreshShopeeCookieWithBrowser } = await import('@/lib/puppeteerCookie');
-          const refreshRes = await refreshShopeeCookieWithBrowser();
+          console.warn('[Shopee API Challenge / Expiration] Triggering Headless Browser Execution...');
+          const { convertLinkViaPuppeteerBrowser } = await import('@/lib/puppeteerCookie');
+          const browserRes = await convertLinkViaPuppeteerBrowser(trimmedUrl, subId);
 
-          if (refreshRes.success && refreshRes.cookie && refreshRes.headerToken) {
-            // Retry with refreshed session token from Headless Browser
-            resShopee = await executeGqlFetch(refreshRes.cookie, refreshRes.headerToken);
-            resText = await resShopee.text();
-            if (resShopee.ok && resText) {
-              try {
-                const gqlData = JSON.parse(resText);
-                const customLinkResult = gqlData?.data?.batchCustomLink?.[0];
-                if (customLinkResult && customLinkResult.shortLink && customLinkResult.failCode === 0) {
-                  officialShortLink = customLinkResult.shortLink;
-                  officialLongLink = customLinkResult.longLink;
-                  isOfficialApiUsed = true;
-                }
-              } catch (pErr) {
-                console.error('[Shopee Retry JSON Parse Error]:', pErr);
-              }
-            }
+          if (browserRes.success && browserRes.shortLink) {
+            officialShortLink = browserRes.shortLink;
+            officialLongLink = browserRes.longLink || trimmedUrl;
+            isOfficialApiUsed = true;
+            isSuccess = true;
           }
         }
       } catch (gqlErr) {
