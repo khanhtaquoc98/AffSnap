@@ -69,21 +69,24 @@ export default function AdminConfigPage() {
     setIsLoading(true);
     setAdminMsg('');
     try {
-      const res = await fetch('/api/admin/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tokenConfig: {
-            headerToken: headerInput,
-            cookie: cookieInput,
-            username: usernameInput,
-            password: passwordInput,
-          },
-          systemConfig: {
-            userCommissionRate: userRateInput,
-          },
-        }),
-      });
+        const spcMatch = cookieInput.match(/SPC_ST=([^;]+)/);
+        const derivedHeaderToken = spcMatch && spcMatch[1] ? spcMatch[1].trim() : headerInput;
+
+        const res = await fetch('/api/admin/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tokenConfig: {
+              headerToken: derivedHeaderToken,
+              cookie: cookieInput,
+              username: usernameInput,
+              password: passwordInput,
+            },
+            systemConfig: {
+              userCommissionRate: userRateInput,
+            },
+          }),
+        });
       const data = await res.json();
       if (data.success) {
         setAdminMsg('Đã lưu cấu hình token và tỷ lệ hoa hồng thành công!');

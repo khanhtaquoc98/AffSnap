@@ -252,7 +252,21 @@ class Store {
   }
 
   updateTokenConfig(update: Partial<ShopeeTokenConfig>): ShopeeTokenConfig {
-    this.tokenConfig = { ...this.tokenConfig, ...update, lastUpdated: new Date().toISOString() };
+    let headerToken = update.headerToken || this.tokenConfig.headerToken;
+    if (update.cookie) {
+      const match = update.cookie.match(/SPC_ST=([^;]+)/);
+      if (match && match[1] && match[1].trim()) {
+        headerToken = match[1].trim();
+      }
+    }
+
+    this.tokenConfig = {
+      ...this.tokenConfig,
+      ...update,
+      headerToken,
+      status: 'ACTIVE',
+      lastUpdated: new Date().toISOString(),
+    };
 
     const encryptedTokenConfig = {
       ...this.tokenConfig,
