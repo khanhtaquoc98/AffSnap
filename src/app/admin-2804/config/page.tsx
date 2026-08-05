@@ -234,8 +234,9 @@ export default function AdminConfigPage() {
                     type="text"
                     value={usernameInput}
                     onChange={(e) => setUsernameInput(e.target.value)}
-                    placeholder="user_shopee_aff"
+                    placeholder="user_shopee_aff hoặc email"
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
+                    required
                   />
                 </div>
 
@@ -247,21 +248,11 @@ export default function AdminConfigPage() {
                     onChange={(e) => setPasswordInput(e.target.value)}
                     placeholder="••••••••"
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
+                    required
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Header Token (Chỉ đọc/Mã hóa)</label>
-                  <input
-                    type="text"
-                    value={headerInput}
-                    onChange={(e) => setHeaderInput(e.target.value)}
-                    placeholder="spc_st_..."
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
+                <div className="md:col-span-2 space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">
                     Tỷ lệ chia hoa hồng User (%) <span className="text-[11px] font-normal text-slate-400">(Nhập 0% = Không chia, Admin giữ 100%)</span>
                   </label>
@@ -276,25 +267,14 @@ export default function AdminConfigPage() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Cookie Chuỗi Phiên Làm Việc (Mã Hóa AES-256)</label>
-                <textarea
-                  rows={3}
-                  value={cookieInput}
-                  onChange={(e) => setCookieInput(e.target.value)}
-                  placeholder="SPC_EC=...; SPC_ST=...;"
-                  className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 resize-none"
-                />
-              </div>
-
               <div className="flex justify-end pt-2">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center gap-2"
+                  className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
                 >
                   <Database className="w-4 h-4 text-orange-400" />
-                  Lưu Cấu Hình Mã Hóa
+                  Lưu Cấu Hình Tài Khoản Auto-Login
                 </button>
               </div>
             </form>
