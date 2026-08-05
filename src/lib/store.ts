@@ -163,14 +163,23 @@ class Store {
 
   async syncFromDatabase(): Promise<void> {
     try {
-      // 1. Sync admin_config
+      // 1. Sync admin_config & system_config
       const { data: configData } = await supabase.from('admin_config').select('*').limit(1);
-      if (configData && configData.length > 0 && configData[0].token_config) {
-        const remoteToken = configData[0].token_config;
-        this.tokenConfig = {
-          ...this.tokenConfig,
-          ...remoteToken,
-        };
+      if (configData && configData.length > 0) {
+        if (configData[0].token_config) {
+          const remoteToken = configData[0].token_config;
+          this.tokenConfig = {
+            ...this.tokenConfig,
+            ...remoteToken,
+          };
+        }
+        if (configData[0].system_config) {
+          const remoteSystem = configData[0].system_config;
+          this.systemConfig = {
+            ...this.systemConfig,
+            ...remoteSystem,
+          };
+        }
       }
 
       // 2. Sync users
@@ -302,6 +311,21 @@ class Store {
       this.systemConfig.userCommissionRate = Math.max(0, Math.min(100, update.userCommissionRate));
       this.systemConfig.adminCommissionRate = 100 - this.systemConfig.userCommissionRate;
     }
+
+    (async () => {
+      try {
+        await supabase.from('admin_config').upsert([
+          {
+            id: 'default',
+            system_config: this.systemConfig,
+            updated_at: new Date().toISOString(),
+          },
+        ]);
+      } catch (err) {
+        console.log('[Supabase System Config Sync Error]:', err);
+      }
+    })();
+
     return this.getSystemConfig();
   }
 

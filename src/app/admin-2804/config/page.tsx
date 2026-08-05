@@ -230,32 +230,23 @@ export default function AdminConfigPage() {
             </div>
 
             <form onSubmit={handleSaveConfig} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Username Shopee Affiliate</label>
-                  <input
-                    type="text"
-                    value={usernameInput}
-                    onChange={(e) => setUsernameInput(e.target.value)}
-                    placeholder="user_shopee_aff hoặc email"
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>Cookie Shopee Phiên Làm Việc Thực (Live Cookie)</span>
+                    <span className="text-[11px] text-orange-600 font-normal">Dán chuỗi cookie từ F12 hoặc đồng bộ từ Extension</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={cookieInput}
+                    onChange={(e) => setCookieInput(e.target.value)}
+                    placeholder="Dán chuỗi cookie từ F12 (Header: cookie) hoặc đồng bộ từ Extension vào đây (SPC_EC=...; SPC_ST=...)"
+                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition resize-y"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Password Shopee</label>
-                  <input
-                    type="password"
-                    value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
-                    required
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">
                     Tỷ lệ chia hoa hồng User (%) <span className="text-[11px] font-normal text-slate-400">(Nhập 0% = Không chia, Admin giữ 100%)</span>
                   </label>
@@ -268,29 +259,16 @@ export default function AdminConfigPage() {
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-emerald-600 focus:outline-none focus:bg-white focus:border-orange-500"
                   />
                 </div>
-
-                <div className="md:col-span-2 space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
-                    Cookie Shopee Phiên Làm Việc Thực (Live Cookie)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={cookieInput}
-                    onChange={(e) => setCookieInput(e.target.value)}
-                    placeholder="Dán chuỗi cookie từ F12 hoặc đồng bộ từ Extension vào đây (SPC_EC=...; SPC_ST=...)"
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 resize-none"
-                  />
-                </div>
               </div>
 
               <div className="flex justify-end pt-2">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer active:scale-98"
                 >
                   <Database className="w-4 h-4 text-orange-400" />
-                  Lưu Cấu Hình Tài Khoản
+                  Lưu Cấu Hình Cookie Live
                 </button>
               </div>
             </form>
