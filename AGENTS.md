@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Project Specific Rules
+- Bắt buộc phải gọi Axios từ Server-side (chạy trong `app/api/.../route.ts` của Next.js hoặc Server Action). Không bao giờ gọi Axios trực tiếp ở file React Component (`'use client'`).
+

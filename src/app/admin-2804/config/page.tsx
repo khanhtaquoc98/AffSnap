@@ -21,6 +21,11 @@ export default function AdminConfigPage() {
 
   const [headerInput, setHeaderInput] = useState('');
   const [cookieInput, setCookieInput] = useState('');
+  const [rawCurlInput, setRawCurlInput] = useState('');
+  const [csrfTokenInput, setCsrfTokenInput] = useState('');
+  const [afAcEncSzTokenInput, setAfAcEncSzTokenInput] = useState('');
+  const [xSapSecInput, setXSapSecInput] = useState('');
+  const [xSapRiInput, setXSapRiInput] = useState('');
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [userRateInput, setUserRateInput] = useState<number>(70);
@@ -39,9 +44,16 @@ export default function AdminConfigPage() {
           dispatch(setTokenConfig(data.tokenConfig));
           setHeaderInput(data.tokenConfig.headerToken || '');
           setCookieInput(data.tokenConfig.cookie || '');
+          setRawCurlInput(data.tokenConfig.rawCurl || '');
+          setCsrfTokenInput(data.tokenConfig.csrfToken || '');
+          setAfAcEncSzTokenInput(data.tokenConfig.afAcEncSzToken || '');
+          setXSapSecInput(data.tokenConfig.xSapSec || '');
+          setXSapRiInput(data.tokenConfig.xSapRi || '');
           setUsernameInput(data.tokenConfig.username || '');
           setPasswordInput(data.tokenConfig.password || '');
         }
+
+
         if (data.systemConfig) {
           dispatch(setSystemConfig(data.systemConfig));
           setUserRateInput(data.systemConfig.userCommissionRate || 70);
@@ -79,6 +91,11 @@ export default function AdminConfigPage() {
             tokenConfig: {
               headerToken: derivedHeaderToken,
               cookie: cookieInput,
+              rawCurl: rawCurlInput,
+              csrfToken: csrfTokenInput,
+              afAcEncSzToken: afAcEncSzTokenInput,
+              xSapSec: xSapSecInput,
+              xSapRi: xSapRiInput,
               username: usernameInput,
               password: passwordInput,
             },
@@ -165,7 +182,7 @@ export default function AdminConfigPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-xl shadow-slate-200/50">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black text-slate-900">Cấu Hình Shopee Token & Mã Hóa</h1>
+                <h1 className="text-2xl font-black text-slate-900">Cấu Hình Shopee Token & Cookie</h1>
                 <span
                   className={`px-2.5 py-0.5 rounded-full font-bold text-xs flex items-center gap-1 border ${
                     tokenConfig.status === 'ACTIVE'
@@ -185,7 +202,7 @@ export default function AdminConfigPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Mã hóa AES-256-CBC bảo mật HeaderToken, Cookie chuỗi phiên và điều chỉnh tỷ lệ chia hoa hồng.
+                Lưu trữ HeaderToken, Cookie chuỗi phiên dạng Plaintext và điều chỉnh tỷ lệ chia hoa hồng.
               </p>
             </div>
 
@@ -213,10 +230,11 @@ export default function AdminConfigPage() {
                   <Key className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Thông Tin Cấu Hình Mã Hóa</h2>
+                  <h2 className="text-base font-bold text-slate-900">Thông Tin Cấu Hình Token & Cookie</h2>
                   <p className="text-xs text-slate-500 font-medium">Tự động hóa lấy Token chu kỳ 1 năm</p>
                 </div>
               </div>
+
 
               <button
                 type="button"
@@ -231,18 +249,62 @@ export default function AdminConfigPage() {
 
             <form onSubmit={handleSaveConfig} className="space-y-4">
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    <span>Cookie Shopee Phiên Làm Việc Thực (Live Cookie)</span>
-                    <span className="text-[11px] text-orange-600 font-normal">Dán chuỗi cookie từ F12 hoặc đồng bộ từ Extension</span>
+                <div className="space-y-1.5 p-4 bg-orange-50/50 rounded-2xl border border-orange-200">
+                  <label className="text-xs font-black text-orange-900 flex items-center justify-between">
+                    <span>🔥 Dán Cụm cURL Trực Tiếp từ F12 (Copy as cURL)</span>
+                    <span className="text-[11px] text-orange-700 font-bold">Khuyên dùng: Tự động bóc tách Cookie & Tất cả Headers!</span>
                   </label>
                   <textarea
-                    rows={4}
+                    rows={5}
+                    value={rawCurlInput}
+                    onChange={(e) => setRawCurlInput(e.target.value)}
+                    placeholder="Dán toàn bộ lệnh cURL từ F12 DevTools vào đây (F12 -> Network -> Chuột phải request batchCustomLink -> Copy -> Copy as cURL)..."
+                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-orange-300 text-xs font-mono text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition resize-y"
+                  />
+                  <p className="text-[11px] text-slate-500 italic">
+                    Khi dán cURL, hệ thống sẽ tự động bóc tách Cookie, csrf-token, af-ac-enc-sz-token và tất cả chữ ký Anti-Bot!
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>Cookie Shopee Phiên Làm Việc Thực (Live Cookie thủ công)</span>
+                    <span className="text-[11px] text-slate-400 font-normal">Tự động cập nhật khi dán cURL ở trên</span>
+                  </label>
+                  <textarea
+                    rows={3}
                     value={cookieInput}
                     onChange={(e) => setCookieInput(e.target.value)}
-                    placeholder="Dán chuỗi cookie từ F12 (Header: cookie) hoặc đồng bộ từ Extension vào đây (SPC_EC=...; SPC_ST=...)"
+                    placeholder="Dán chuỗi cookie từ F12 (Header: cookie) vào đây nếu không dùng cURL..."
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition resize-y"
-                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>Header `csrf-token` (Lấy từ F12 Network Request Header)</span>
+                    <span className="text-[11px] text-orange-600 font-normal">Tùy chọn: Nhập giá trị csrf-token từ F12</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={csrfTokenInput}
+                    onChange={(e) => setCsrfTokenInput(e.target.value)}
+                    placeholder="VD: KnOSzS7q-c51aWmd0-5S9hiCDZCQMul6-5UI"
+                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>Header `af-ac-enc-sz-token` (Anti-Bot Browser Token tùy chọn)</span>
+                    <span className="text-[11px] text-slate-400 font-normal">Dán chuỗi token nếu Shopee yêu cầu anti-bot</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={afAcEncSzTokenInput}
+                    onChange={(e) => setAfAcEncSzTokenInput(e.target.value)}
+                    placeholder="Dán chuỗi af-ac-enc-sz-token từ F12 nếu có..."
+                    className="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-orange-500 resize-y"
                   />
                 </div>
 

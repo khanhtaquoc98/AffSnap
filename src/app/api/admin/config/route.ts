@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import store from '@/lib/store';
+import { parseCurlCommand } from '@/lib/curlParser';
 
 export async function GET() {
   return NextResponse.json({
@@ -36,39 +37,26 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'AUTO_LOGIN') {
-      const currentConfig = store.getTokenConfig();
-      const username = tokenConfig?.username || currentConfig.username;
-      const password = tokenConfig?.password || currentConfig.password;
-
-      if (!username || !password) {
-        return NextResponse.json(
-          { error: 'Vui lòng cung cấp đầy đủ Username và Password Shopee để tự động đăng nhập!' },
-          { status: 400 }
-        );
-      }
-
-      // Tự động mô phỏng đăng nhập & lấy Cookie / Token phiên làm việc mới
-      const autoToken = `spc_st_auto_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      const autoCookie = `SPC_EC=auto_ec_${Date.now()}; SPC_ST=${autoToken}; SPC_U=${username};`;
-
-      const updated = store.updateTokenConfig({
-        username,
-        password,
-        autoLoginEnabled: true,
-        headerToken: autoToken,
-        cookie: autoCookie,
-        status: 'ACTIVE',
-        lastUpdated: new Date().toISOString(),
-      });
+      const { exec } = require('child_process');
+      console.log('🚀 Triggering Shopee Chrome Login Service from Admin UI...');
+      
+      // Launch login_shopee script asynchronously
+      exec('npm run login:shopee', { cwd: process.cwd() });
 
       return NextResponse.json({
         success: true,
-        message: `Đã tự động đăng nhập tài khoản Shopee (${username}) thành công! Session Cookie và Header Token đã được trích xuất & làm mới.`,
-        tokenConfig: updated,
+        message: 'Đã tự động mở cửa sổ Chrome trên màn hình! Vui lòng hoàn tất Đăng nhập Shopee trên cửa sổ Chrome vừa bật ra, hệ thống sẽ tự động bóc tách Token & Cookie mới nạp vào CSDL.',
       });
     }
 
     if (tokenConfig) {
+      if (tokenConfig.rawCurl && tokenConfig.rawCurl.trim()) {
+        const parsed = parseCurlCommand(tokenConfig.rawCurl);
+        if (parsed.cookie) {
+          tokenConfig.cookie = parsed.cookie;
+        }
+        tokenConfig.rawHeaders = parsed.headers;
+      }
       store.updateTokenConfig(tokenConfig);
     }
 
@@ -78,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Cập nhật cấu hình thành công!',
+      message: 'Cập nhật cấu hình cURL và Token thành công!',
       tokenConfig: store.getTokenConfig(),
       systemConfig: store.getSystemConfig(),
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react';
+import { convertViaChromeExtension } from '@/lib/extensionBridge';
 
 const emptySubscribe = () => () => {};
 import {
@@ -169,26 +170,25 @@ export default function HomePage() {
 
     dispatch(setIsConverting(true));
     dispatch(setErrorMessage(''));
-    dispatch(setConvertedResult(null));
 
     try {
-      const uId = currentUser === 'USER' ? 'user-1' : currentUser === 'ADMIN' ? 'admin-1' : null;
+      const uId = currentUser === 'USER' ? 'user-1' : currentUser === 'ADMIN' ? 'admin-1' : 'guest';
+
       const res = await fetch('/api/convert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: inputUrl, userId: uId }),
+        body: JSON.stringify({ originalUrl: inputUrl, subId: uId }),
       });
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Chuyển đổi thất bại');
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Tạo link thất bại');
       }
 
-      dispatch(setConvertedResult(data.data));
-      dispatch(addHistoryLink(data.data));
+      const shortLink = data.shortLink || data.data?.shortLink;
 
-      if (data.data?.affiliateUrl) {
-        window.open(data.data.affiliateUrl, '_blank', 'noopener,noreferrer');
+      if (shortLink) {
+        window.open(shortLink, '_blank', 'noopener,noreferrer');
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
@@ -197,6 +197,7 @@ export default function HomePage() {
       dispatch(setIsConverting(false));
     }
   };
+
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -455,87 +456,7 @@ export default function HomePage() {
                 </div>
               )}
 
-              {/* Result Box */}
-              {convertedResult && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-orange-50/70 border border-orange-200 space-y-3.5 shadow-xs">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-xs font-bold text-orange-800 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Tạo Link Affiliate Thành Công! (Đã tự động mở tab mới)
-                    </span>
-                  </div>
-
-                  {/* SHOPEE AFFILIATE SHORTLINK */}
-                  {(() => {
-                    const isOfficialShortLink = convertedResult.affiliateUrl?.startsWith('https://s.shopee.vn');
-                    const resultUrl = isOfficialShortLink
-                      ? convertedResult.affiliateUrl
-                      : typeof window !== 'undefined'
-                      ? `${window.location.origin}/s/${convertedResult.shortCode}`
-                      : `/s/${convertedResult.shortCode}`;
-
-                    return (
-                      <div className="space-y-1">
-                        <span className="text-[11px] font-bold text-slate-600">
-                          🔗 Link Affiliate {isOfficialShortLink ? 'Shopee Chính Thức' : 'Rút Gọn'}:
-                        </span>
-                        <div className="p-3 rounded-xl bg-white border border-orange-200 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-                          <span className="text-xs sm:text-sm font-mono font-bold text-orange-600 break-all truncate">
-                            {resultUrl}
-                          </span>
-                          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                            <a
-                              href={resultUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              Mở
-                            </a>
-                            <button
-                              onClick={() => handleCopy(resultUrl)}
-                              className="px-3.5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-md shadow-orange-500/20"
-                            >
-                              {copied ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                              {copied ? 'Đã chép' : 'Sao chép'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
             </div>
-
-            {/* History Link Pills (Logged-in User) */}
-            {user && historyLinks.length > 0 && (
-              <div className="w-full max-w-2xl mx-auto pt-2 text-left space-y-2">
-                <h3 className="text-xs font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wider">
-                  <Link2 className="w-4 h-4 text-orange-600" />
-                  Các Link Bạn Đã Tạo Gần Đây
-                </h3>
-                <div className="divide-y divide-slate-200 rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
-                  {historyLinks.slice(0, 2).map((item) => (
-                    <div key={item.id} className="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
-                      <div className="space-y-0.5 min-w-0">
-                        <p className="text-xs font-mono font-bold text-orange-600 truncate">
-                          {item.affiliateUrl}
-                        </p>
-                        <p className="text-[11px] text-slate-500 truncate">{item.originalUrl}</p>
-                      </div>
-                      <button
-                        onClick={() => handleCopy(item.affiliateUrl)}
-                        className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition shrink-0 border border-slate-200"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </section>
 

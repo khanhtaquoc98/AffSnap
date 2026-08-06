@@ -4,7 +4,7 @@ const http = require('http');
 
 async function launchShopeeLoginWindow() {
   console.log('----------------------------------------------------');
-  console.log('🚀 ĐANG MỞ TRÌNH DUYỆT CHROME ĐỂ ĐĂNG NHẬP SHOPEE AFFILIATE...');
+  console.log('🚀 ĐANG MỞ CHROME SERVICE (PORT 9222) ĐỂ TẠO CUSTOM LINK CHO USER...');
   console.log('----------------------------------------------------');
 
   const { default: puppeteer } = await import('puppeteer-core');
@@ -15,35 +15,63 @@ async function launchShopeeLoginWindow() {
     '/usr/bin/google-chrome';
 
   const userDataDir = path.join(process.cwd(), '.puppeteer_session');
+  fs.mkdirSync(userDataDir, { recursive: true });
 
-  const browser = await puppeteer.launch({
-    executablePath,
-    headless: false, // Visual Chrome window on Mac screen
-    defaultViewport: null,
-    userDataDir,
-    ignoreDefaultArgs: ['--enable-automation'],
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-blink-features=AutomationControlled',
-      '--start-maximized',
-    ],
-  });
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      executablePath,
+      headless: false,
+      defaultViewport: null,
+      userDataDir,
+      ignoreDefaultArgs: ['--enable-automation'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-blink-features=AutomationControlled',
+        '--no-first-run',
+        '--no-default-browser-check',
+        `--user-data-dir=${userDataDir}`,
+        '--remote-debugging-port=9222',
+        '--start-maximized',
+      ],
+    });
+  } catch (err) {
+    const { execSync } = require('child_process');
+    console.log('⚡ Sử dụng macOS Chrome runner...');
+    try {
+      execSync(`open -n -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir="${userDataDir}" "https://affiliate.shopee.vn/offer/custom_link"`);
+    } catch (e) {}
 
-  const pages = await browser.pages();
-  const page = pages.length > 0 ? pages[0] : await browser.newPage();
+    await new Promise((r) => setTimeout(r, 2000));
+
+    try {
+      browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
+    } catch (connErr) {
+      console.error('Không thể kết nối Chrome:', connErr.message);
+      process.exit(1);
+    }
+  }
+
+  let page;
+  try {
+    const pages = await browser.pages();
+    page = pages.find((p) => !p.isClosed());
+    if (!page) page = await browser.newPage();
+  } catch (e) {
+    page = await browser.newPage();
+  }
 
   console.log('📍 Đang mở trang: https://affiliate.shopee.vn/offer/custom_link');
   await page.goto('https://affiliate.shopee.vn/offer/custom_link', {
     waitUntil: 'domcontentloaded',
   });
 
-  console.log('\n👉 Vui lòng ĐĂNG NHẬP tài khoản Shopee trên cửa sổ Chrome vừa mở ra!');
-  console.log('👉 Cửa sổ này sẽ tự động đồng bộ Session vào Database Supabase cho cả Vercel & Local!\n');
+  console.log('\n👉 Vui lòng ĐĂNG NHẬP tài khoản Shopee Affiliate của bạn (Admin Token)!');
+  console.log('👉 Trình duyệt này sẽ chạy ngầm trên Port 9222 để tự động tạo s.shopee.vn cho tất cả User!\n');
 
   let isHandled = false;
 
-  // Monitor URL change & login status
   const checkInterval = setInterval(async () => {
     if (isHandled) return;
     try {
@@ -51,17 +79,24 @@ async function launchShopeeLoginWindow() {
       const cookies = await page.cookies();
       const spcSt = cookies.find((c) => c.name === 'SPC_ST');
 
-      if (currentUrl.includes('affiliate.shopee.vn') && !currentUrl.includes('login') && spcSt) {
+      const isCustomLinkPage = currentUrl.includes('/offer/') || currentUrl.includes('/dashboard') || currentUrl.includes('/account_setting');
+      const isErrorPage = currentUrl.includes('verify') || currentUrl.includes('login');
+
+      if (isCustomLinkPage && !isErrorPage && spcSt) {
         isHandled = true;
         clearInterval(checkInterval);
 
         const cookieStr = cookies.map((c) => `${c.name}=${c.value}`).join('; ');
-        console.log('====================================================');
-        console.log('✅ ĐÃ PHÁT HIỆN ĐĂNG NHẬP SHOPEE AFFILIATE THÀNH CÔNG!');
-        console.log('✅ SPC_ST Token:', spcSt.value.substring(0, 30) + '...');
-        console.log('🔄 Đang đồng bộ Cookie mới vào Database Supabase cho Vercel & Local...');
+        const csrfObj = cookies.find((c) => c.name === 'csrftoken');
+        const csrfTokenVal = csrfObj ? csrfObj.value : spcSt.value.substring(0, 32);
 
-        // 1. Save locally to live_cookie.json
+        console.log('====================================================');
+        console.log('✅ THÀNH CÔNG: TÀI KHOẢN SHOPEE AFFILIATE ADMIN ĐÃ ĐĂNG NHẬP!');
+        console.log('✅ SPC_ST Token:', spcSt.value.substring(0, 30) + '...');
+        console.log('⚡ TRÌNH DUYỆT ĐANG CHẠY TRÊN PORT 9222 SẴN SÀNG PHỤC VỤ MỌI MÁY CHỦ!');
+        console.log('====================================================');
+
+        // Save locally to live_cookie.json
         const jsonPath = path.join(process.cwd(), 'src', 'data', 'live_cookie.json');
         try {
           fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
@@ -71,18 +106,16 @@ async function launchShopeeLoginWindow() {
               {
                 cookie: cookieStr,
                 headerToken: spcSt.value,
+                csrfToken: csrfTokenVal,
                 updatedAt: new Date().toISOString(),
               },
               null,
               2
             )
           );
-          console.log('💾 [Lưu File Local]: src/data/live_cookie.json');
-        } catch (fErr) {
-          console.warn('⚠️ Lỗi ghi live_cookie.json:', fErr);
-        }
+        } catch {}
 
-        // 2. Sync to running Next.js dev server on port 3333 via HTTP POST
+        // Sync to running Next.js dev server on port 3333 via HTTP POST
         const payload = JSON.stringify({
           tokenConfig: {
             cookie: cookieStr,
@@ -102,29 +135,11 @@ async function launchShopeeLoginWindow() {
               'Content-Length': Buffer.byteLength(payload),
             },
           },
-          (res) => {
-            let data = '';
-            res.on('data', (chunk) => (data += chunk));
-            res.on('end', () => {
-              console.log('⚡ [Đồng Bộ HTTP 3333]: Thành công! Phản hồi:', data.substring(0, 100));
-            });
-          }
+          () => {}
         );
-
-        req.on('error', (e) => {
-          console.warn('⚠️ [Đồng bộ local warning]: Dev Server 3333 chưa bật. Cookie đã được lưu vào File & Supabase DB!');
-        });
-
+        req.on('error', () => {});
         req.write(payload);
         req.end();
-
-        console.log('====================================================');
-
-        setTimeout(async () => {
-          console.log('🔒 Đóng cửa sổ thiết lập. Hoàn tất!');
-          await browser.close();
-          process.exit(0);
-        }, 3000);
       }
     } catch {}
   }, 2000);
