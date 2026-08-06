@@ -62,8 +62,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         );
 
         shortLink = response.data?.data?.generateShortLink?.shortLink;
-      } catch (error: any) {
-        console.warn('[Shopee GQL generateShortLink Warning]:', error.response?.data || error.message);
+      } catch (error: unknown) {
+        const errObj = error as { response?: { data?: unknown }; message?: string };
+        console.warn('[Shopee GQL generateShortLink Warning]:', errObj.response?.data || errObj.message);
       }
     }
 
@@ -87,13 +88,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       },
       message: 'Tạo link Shopee Affiliate thành công!',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Convert Route Error]:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Lỗi máy chủ khi tạo link Shopee Affiliate',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

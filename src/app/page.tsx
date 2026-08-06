@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react';
-import { convertViaChromeExtension } from '@/lib/extensionBridge';
-
-const emptySubscribe = () => () => {};
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Link2,
   Copy,
-  CheckCircle2,
   RefreshCw,
   ArrowRight,
   Sparkles,
@@ -30,26 +26,20 @@ import {
   Monitor,
   Share2,
   X,
-  MessageSquare,
-  Bot,
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { useAppDispatch, useAppSelector } from '@/store';
 import {
   setInputUrl,
   setIsConverting,
-  setConvertedResult,
-  setCopied,
   setErrorMessage,
   setHistoryLinks,
-  addHistoryLink,
 } from '@/store/slices/convertSlice';
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.auth.currentUser);
-  const user = useAppSelector((state) => state.auth.user);
-  const { inputUrl, isConverting, convertedResult, copied, errorMessage, historyLinks } =
+  const { inputUrl, isConverting, errorMessage } =
     useAppSelector((state) => state.convert);
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -58,7 +48,6 @@ export default function HomePage() {
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [guideTab, setGuideTab] = useState<'mobile' | 'pc' | 'bot'>('mobile');
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
-  const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isLockedRef = useRef(false);
   const touchStartYRef = useRef(0);
@@ -114,8 +103,21 @@ export default function HomePage() {
     }, 750);
   };
 
+  // Lock background body scroll when guide modal is open
+  useEffect(() => {
+    if (isGuideModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isGuideModalOpen]);
+
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
+      if (isGuideModalOpen) return;
       if (window.innerWidth < 1024) return;
       if (isLockedRef.current) return;
 
@@ -127,6 +129,7 @@ export default function HomePage() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isGuideModalOpen) return;
       if (isLockedRef.current) return;
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         if (activeSlide < totalSlides - 1) goToSlide(activeSlide + 1);
@@ -136,10 +139,12 @@ export default function HomePage() {
     };
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (isGuideModalOpen) return;
       touchStartYRef.current = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
+      if (isGuideModalOpen) return;
       if (window.innerWidth >= 1024) return;
       if (isLockedRef.current) return;
       const touchEndY = e.changedTouches[0].clientY;
@@ -163,7 +168,7 @@ export default function HomePage() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [activeSlide]);
+  }, [activeSlide, isGuideModalOpen]);
 
   const handleConvert = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,13 +204,6 @@ export default function HomePage() {
     } finally {
       dispatch(setIsConverting(false));
     }
-  };
-
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    dispatch(setCopied(true));
-    setTimeout(() => dispatch(setCopied(false)), 2000);
   };
 
   const handlePaste = async () => {
@@ -773,8 +771,14 @@ export default function HomePage() {
 
       {/* GUIDANCE MODAL (HOW TO GET SHOPEE LINK ON PC / MOBILE) */}
       {isGuideModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeInTab">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-modal-pop relative text-left">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeInTab"
+          onClick={() => setIsGuideModalOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-modal-pop relative text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="p-5 sm:p-6 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -862,7 +866,7 @@ export default function HomePage() {
                       <span className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
                       <div>
                         <p className="font-bold text-slate-900 flex items-center gap-1">
-                          Chọn "Sao chép liên kết" <Copy className="w-3.5 h-3.5 text-orange-600 inline" />
+                          Chọn &quot;Sao chép liên kết&quot; <Copy className="w-3.5 h-3.5 text-orange-600 inline" />
                         </p>
                         <p className="text-slate-500 text-xs mt-0.5">Đường dẫn sản phẩm dạng <code className="bg-slate-100 px-1.5 py-0.5 rounded text-orange-600 font-mono text-[11px]">https://s.shopee.vn/...</code> sẽ được lưu vào clipboard.</p>
                       </div>

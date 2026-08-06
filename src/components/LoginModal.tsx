@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,6 +29,17 @@ export const LoginModal: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const loginMethods = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -97,7 +108,19 @@ export const LoginModal: React.FC = () => {
       
       // If Google Client ID is configured, load GIS script if not present and prompt
       if (clientId && typeof window !== 'undefined') {
-        if (!(window as unknown as { google?: any }).google) {
+        type GoogleOauthClient = {
+          accounts?: {
+            oauth2?: {
+              initTokenClient: (config: {
+                client_id: string;
+                scope: string;
+                callback: (res: { access_token?: string; error?: string }) => void;
+              }) => { requestAccessToken: () => void };
+            };
+          };
+        };
+        const win = window as unknown as { google?: GoogleOauthClient['accounts'] extends undefined ? never : GoogleOauthClient };
+        if (!win.google) {
           await new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
             script.src = 'https://accounts.google.com/gsi/client';
@@ -109,7 +132,7 @@ export const LoginModal: React.FC = () => {
           });
         }
 
-        const googleObj = (window as unknown as { google?: any }).google;
+        const googleObj = (window as unknown as { google?: GoogleOauthClient }).google;
         if (googleObj?.accounts?.oauth2) {
           const tokenClient = googleObj.accounts.oauth2.initTokenClient({
             client_id: clientId,

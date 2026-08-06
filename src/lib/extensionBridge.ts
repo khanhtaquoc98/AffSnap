@@ -25,7 +25,15 @@ export async function convertViaChromeExtension(
 ): Promise<ConvertLinkResult | null> {
   if (typeof window === 'undefined') return null;
 
-  const chromeRuntime = (window as { chrome?: { runtime?: any } }).chrome?.runtime;
+  interface ChromeRuntime {
+    sendMessage: {
+      (extensionId: string, message: unknown, callback?: (response: ExtensionConvertResponse) => void): void;
+      (message: unknown, callback?: (response: ExtensionConvertResponse) => void): void;
+    };
+    lastError?: { message?: string };
+  }
+
+  const chromeRuntime = (window as unknown as { chrome?: { runtime?: ChromeRuntime } }).chrome?.runtime;
   if (!chromeRuntime || !chromeRuntime.sendMessage) {
     return null;
   }

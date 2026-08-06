@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { exec } from 'child_process';
 import store from '@/lib/store';
 import { parseCurlCommand } from '@/lib/curlParser';
 
@@ -37,7 +38,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'AUTO_LOGIN') {
-      const { exec } = require('child_process');
       console.log('🚀 Triggering Shopee Chrome Login Service from Admin UI...');
       
       // Launch login_shopee script asynchronously
