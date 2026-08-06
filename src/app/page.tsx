@@ -57,6 +57,7 @@ export default function HomePage() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [guideTab, setGuideTab] = useState<'mobile' | 'pc' | 'bot'>('mobile');
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isLockedRef = useRef(false);
@@ -170,6 +171,7 @@ export default function HomePage() {
 
     dispatch(setIsConverting(true));
     dispatch(setErrorMessage(''));
+    setGeneratedLink(null);
 
     try {
       const uId = currentUser === 'USER' ? 'user-1' : currentUser === 'ADMIN' ? 'admin-1' : 'guest';
@@ -188,6 +190,7 @@ export default function HomePage() {
       const shortLink = data.shortLink || data.data?.shortLink;
 
       if (shortLink) {
+        setGeneratedLink(shortLink);
         window.open(shortLink, '_blank', 'noopener,noreferrer');
       }
     } catch (err: unknown) {
@@ -456,6 +459,20 @@ export default function HomePage() {
                 </div>
               )}
 
+              {/* Action Button: Nhấn vào đây */}
+              {generatedLink && (
+                <div className="pt-2 flex justify-center">
+                  <a
+                    href={generatedLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm sm:text-base shadow-lg shadow-orange-500/25 transition cursor-pointer active:scale-95 border border-orange-300/80"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Nhấn vào đây</span>
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </section>
